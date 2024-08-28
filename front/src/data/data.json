@@ -1,0 +1,16 @@
+{
+  "predictions": [
+    {
+      "confidence": 0.9999994039535522,
+      "label": "converse"
+    },
+    {
+      "confidence": 6.110640242695808e-7,
+      "label": "adidas"
+    },
+    {
+      "confidence": 3.1418050383535956e-8,
+      "label": "nike"
+    }
+  ]
+}

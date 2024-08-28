@@ -1,0 +1,12 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "outDir": "./dist",       // Directorio de salida para archivos compilados
+    "rootDir": "./src",       // Directorio raíz para archivos fuente
+    "strict": true,           // Mantener todas las opciones estrictas
+    "esModuleInterop": true,  // Permitir la interoperabilidad con módulos ES
+    "skipLibCheck": true      // Omitir la verificación de tipos en archivos de declaración
+  },
+  "include": ["src/**/*"],     // Incluir todos los archivos TypeScript en el directorio src
+  "exclude": ["node_modules"]  // Excluir node_modules
+}

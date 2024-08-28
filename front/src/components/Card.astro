@@ -1,0 +1,26 @@
+---
+interface Props {
+  Probabilidad: string;
+  prov: number;
+  body: string;
+}
+
+const { Probabilidad, prov,body } = Astro.props;
+---
+
+<li class="link-card">
+  <div>
+    <p>
+      {Probabilidad}
+    </p>
+    <p>
+      {prov}
+    </p>
+    <p>
+      {body}
+    </p>
+  </div>
+</li>
+<style>
+
+</style>

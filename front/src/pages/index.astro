@@ -1,0 +1,203 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Welcome to Astro.">
+  <main>
+    <h1>
+      Modelo entrenado en <span class="text-gradient">Lobe</span>
+      <p>Predicciones de tipo de tenis</p>
+    </h1>
+    <section class="sectionImage"
+      <div>
+        <label for="file-input" class="custom-file-button"
+          >Seleccionar Imagen</label
+        >
+
+        <!-- Input de archivos oculto -->
+        <input type="file" accept=".jpg, .png" id="file-input" />
+
+        <!-- Puedes agregar un mensaje o área para mostrar la imagen seleccionada -->
+        <div id="preview-container"></div>
+      </div>
+      <button id="submit-button" class="button">Generar Predicciones</button>
+    </section>
+    <img
+      id="preview-image"
+      alt="Preview"
+      style="display: none; max-width: 100%; height: auto;"
+    />
+    <ul role="list" class="link-card-grid"></ul>
+  </main>
+</Layout>
+
+<style>
+	.sectionImage{
+		display: flex;
+		gap: 8px;
+	}
+  main {
+    margin: auto;
+    padding: 1rem;
+    width: 900px;
+    max-width: calc(100% - 2rem);
+    color: white;
+    font-size: 20px;
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  #file-input {
+    display: none;
+  }
+
+  /* Estilizar el botón externo */
+  .custom-file-button {
+    display: inline-flex;
+    padding: 10px 250px;
+    font-size: 16px;
+    color: white;
+
+    border: solid 1px white;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .custom-file-button:hover {
+    background-color: var(--accent-light);
+  }
+
+  .button {
+    background-image: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 200%;
+    background-position: 0%;
+    border: solid 1px #fff2;
+    padding: 0.5rem 3rem;
+    cursor: pointer;
+    &:is(:hover, :focus-within) {
+      background-position: 0;
+      background-image: var(--accent-gradient);
+    }
+  }
+  p {
+    font-size: 1.5rem;
+    background-image: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 200%;
+    background-position: 0%;
+  }
+  .astro-a {
+    position: absolute;
+    top: -32px;
+    left: 50%;
+    transform: translatex(-50%);
+    width: 220px;
+    height: auto;
+    z-index: -1;
+  }
+  h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    width: 80%;
+    margin: 1em auto;
+  }
+  .text-gradient {
+    background-image: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 400%;
+    background-position: 0%;
+  }
+  .instructions {
+    margin-bottom: 2rem;
+    border: 1px solid rgba(var(--accent-light), 25%);
+    background: linear-gradient(
+      rgba(var(--accent-dark), 66%),
+      rgba(var(--accent-dark), 33%)
+    );
+    padding: 1.5rem;
+    border-radius: 8px;
+  }
+  .instructions code {
+    font-size: 0.8em;
+    font-weight: bold;
+    background: rgba(var(--accent-light), 12%);
+    color: rgb(var(--accent-light));
+    border-radius: 4px;
+    padding: 0.3em 0.4em;
+  }
+  .instructions strong {
+    color: rgb(var(--accent-light));
+  }
+  .link-card-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(5rem, 1fr));
+    gap: 2rem;
+    padding: 0;
+  }
+</style>
+<script>
+  import { uploadFile } from "../service/PostImage";
+  document.addEventListener("DOMContentLoaded", () => {
+    const fileInput = document.querySelector("#file-input") as HTMLInputElement;
+    const previewImage = document.querySelector(
+      "#preview-image"
+    ) as HTMLInputElement;
+    const submitButton = document.querySelector("#submit-button");
+    const resultContainer = document.querySelector(".link-card-grid");
+
+    fileInput?.addEventListener("change", () => {
+      const file = fileInput?.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImage.src = e.target.result;
+          previewImage.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      } else {
+        previewImage.style.display = "none";
+      }
+    });
+
+    submitButton?.addEventListener("click", async () => {
+      const file = fileInput?.files?.[0];
+      if (file) {
+        try {
+          const response = await uploadFile(
+            "http://192.168.0.5:5000",
+            "/predict",
+            file
+          );
+          const result = await response.json();
+          if (resultContainer) {
+            resultContainer.innerHTML = result.predictions
+              .map(
+                (prediction) => `
+              <li class="link-card">
+                <div>
+                  <p> ${prediction.confidence.toFixed(2)}</p>
+                  <p> ${prediction.confidence}</p>
+                  <p>Etiqueta: ${prediction.label}</p>
+                </div>
+              </li>`
+              )
+              .join("");
+          }
+        } catch (error) {
+          console.error("Error uploading file:", error);
+        }
+      }
+    });
+  });
+</script>
